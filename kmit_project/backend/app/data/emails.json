@@ -1,0 +1,98 @@
+[
+  {
+    "user_id": "u_301",
+    "sender": "billing@streamflix.com",
+    "subject": "Your StreamFlix subscription has renewed",
+    "date": "2026-09-15T08:00:00Z",
+    "event_type": "subscription_renewal",
+    "body": "Dear Subscriber,\nYour monthly subscription of ₹649 has been renewed on your credit card. Next billing date: October 15, 2026. Enjoy unlimited streaming on StreamFlix!",
+    "extracted_data": {
+      "merchant": "StreamFlix",
+      "amount": 649,
+      "currency": "₹",
+      "cadence": "monthly",
+      "next_billing_date": "2026-10-15"
+    }
+  },
+  {
+    "user_id": "u_301",
+    "sender": "updates@canva.com",
+    "subject": "Important update: Your Canva Pro subscription price is changing",
+    "date": "2026-08-25T14:30:00Z",
+    "event_type": "price_hike",
+    "body": "Hi Designer,\nWe are adding powerful new generative AI features to Canva Pro. Effective September 20, 2026, your monthly plan will increase from ₹499 to ₹599. If you wish to manage your subscription, visit your account settings.",
+    "extracted_data": {
+      "merchant": "Canva Pro",
+      "event": "price_hike",
+      "old_price": 499,
+      "new_price": 599,
+      "effective_date": "2026-09-20",
+      "percentage_increase": 20.0
+    }
+  },
+  {
+    "user_id": "u_301",
+    "sender": "welcome@headspace.com",
+    "subject": "Welcome! Your 30-day Headspace free trial has started",
+    "date": "2026-08-05T10:00:00Z",
+    "event_type": "free_trial_started",
+    "body": "Welcome to Headspace. Your 30-day free trial is now active until September 4, 2026. After your trial ends, your subscription will automatically renew at ₹599/month unless cancelled 24 hours prior.",
+    "extracted_data": {
+      "merchant": "Headspace",
+      "event": "free_trial_started",
+      "trial_days": 30,
+      "subsequent_price": 599,
+      "expiry_date": "2026-09-04"
+    }
+  },
+  {
+    "user_id": "u_301",
+    "sender": "billing@headspace.com",
+    "subject": "Your Headspace trial converted to paid subscription",
+    "date": "2026-09-05T09:00:00Z",
+    "event_type": "free_trial_converted",
+    "body": "Your Headspace trial has completed. You have been billed ₹599 for your first monthly membership cycle.",
+    "extracted_data": {
+      "merchant": "Headspace",
+      "event": "free_trial_converted",
+      "amount": 599
+    }
+  },
+  {
+    "user_id": "u_301",
+    "sender": "notifications@tunewave.fm",
+    "subject": "TuneWave Premium: Monthly invoice",
+    "date": "2026-09-05T04:12:00Z",
+    "event_type": "subscription_renewal",
+    "body": "Your TuneWave Hi-Fi plan renewal of ₹399 was successful. Thank you for listening!",
+    "extracted_data": {
+      "merchant": "TuneWave",
+      "amount": 399
+    }
+  },
+  {
+    "user_id": "u_301",
+    "sender": "accounts@musicbox.io",
+    "subject": "MusicBox Premium receipt for September",
+    "date": "2026-09-12T11:45:00Z",
+    "event_type": "subscription_renewal",
+    "body": "Receipt for MusicBox Premium: ₹499 billed on Sep 12, 2026.",
+    "extracted_data": {
+      "merchant": "MusicBox Premium",
+      "amount": 499
+    }
+  },
+  {
+    "user_id": "u_301",
+    "sender": "policy@healthguard.in",
+    "subject": "HealthGuard Policy Premium Statement",
+    "date": "2026-09-01T06:00:00Z",
+    "event_type": "policy_statement",
+    "body": "Dear Policyholder, your monthly premium of ₹2500 for Comprehensive Health Shield Policy #HG-99238 has been debited.",
+    "extracted_data": {
+      "merchant": "HealthGuard Insurance",
+      "amount": 2500,
+      "category": "insurance"
+    }
+  }
+]

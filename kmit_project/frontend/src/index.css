@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background: radial-gradient(circle at 75% 35%, rgba(111, 85, 239, 0.18), transparent 35%),
+                radial-gradient(circle at 20% 75%, rgba(104, 199, 255, 0.12), transparent 30%),
+                linear-gradient(135deg, #f8f6ff, #ede8ff, #f4f0ff);
+    background-attachment: fixed;
+    color: #17132d;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* VeriVision Glassmorphic Card */
+.veri-card {
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 30px rgba(23, 19, 45, 0.05);
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.veri-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(111, 85, 239, 0.35);
+  box-shadow: 0 16px 36px rgba(111, 85, 239, 0.12);
+}
+
+/* VeriVision HUD Pulse Dot */
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+.hud-dot {
+  width: 7px;
+  height: 7px;
+  background: #6f55ef;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #6f55ef;
+  animation: pulseDot 1.8s ease-in-out infinite;
+}
+
+/* VeriVision Scanning Line Animation */
+@keyframes scanLine {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #6f55ef;
+  box-shadow: 0 0 20px #6f55ef;
+  animation: scanLine 2s ease-in-out infinite alternate;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f4f1ff;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(111, 85, 239, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(111, 85, 239, 0.5);
+}

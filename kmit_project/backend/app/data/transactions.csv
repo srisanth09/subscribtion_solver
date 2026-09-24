@@ -1,0 +1,46 @@
+user_id,transaction_id,merchant,amount,currency,date,category,description
+u_301,TX1001,Netflix,649,₹,2026-06-01,video_streaming,Netflix Standard Monthly Plan
+u_301,TX1002,Netflix,649,₹,2026-07-01,video_streaming,Netflix Standard Monthly Plan
+u_301,TX1003,Netflix,649,₹,2026-08-01,video_streaming,Netflix Standard Monthly Plan
+u_301,TX1004,Netflix,649,₹,2026-09-01,video_streaming,Netflix Standard Monthly Plan
+u_301,TX1005,StreamFlix,649,₹,2026-03-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1006,StreamFlix,649,₹,2026-04-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1007,StreamFlix,649,₹,2026-05-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1008,StreamFlix,649,₹,2026-06-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1009,StreamFlix,649,₹,2026-07-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1010,StreamFlix,649,₹,2026-08-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1011,StreamFlix,649,₹,2026-09-15,video_streaming,StreamFlix 4K Entertainment Plan
+u_301,TX1012,IronFit Gym,1500,₹,2026-06-10,fitness,IronFit Monthly Club Access
+u_301,TX1013,IronFit Gym,1500,₹,2026-07-10,fitness,IronFit Monthly Club Access
+u_301,TX1014,IronFit Gym,1500,₹,2026-08-10,fitness,IronFit Monthly Club Access
+u_301,TX1015,IronFit Gym,1500,₹,2026-09-10,fitness,IronFit Monthly Club Access
+u_301,TX1016,TuneWave,399,₹,2026-06-05,music_streaming,TuneWave Hi-Fi Music Stream
+u_301,TX1017,TuneWave,399,₹,2026-07-05,music_streaming,TuneWave Hi-Fi Music Stream
+u_301,TX1018,TuneWave,399,₹,2026-08-05,music_streaming,TuneWave Hi-Fi Music Stream
+u_301,TX1019,TuneWave,399,₹,2026-09-05,music_streaming,TuneWave Hi-Fi Music Stream
+u_301,TX1020,MusicBox Premium,499,₹,2026-06-12,music_streaming,MusicBox Premium Unlimited
+u_301,TX1021,MusicBox Premium,499,₹,2026-07-12,music_streaming,MusicBox Premium Unlimited
+u_301,TX1022,MusicBox Premium,499,₹,2026-08-12,music_streaming,MusicBox Premium Unlimited
+u_301,TX1023,MusicBox Premium,499,₹,2026-09-12,music_streaming,MusicBox Premium Unlimited
+u_301,TX1024,HealthGuard Insurance,2500,₹,2026-06-01,insurance,HealthGuard Comprehensive Health Policy
+u_301,TX1025,HealthGuard Insurance,2500,₹,2026-07-01,insurance,HealthGuard Comprehensive Health Policy
+u_301,TX1026,HealthGuard Insurance,2500,₹,2026-08-01,insurance,HealthGuard Comprehensive Health Policy
+u_301,TX1027,HealthGuard Insurance,2500,₹,2026-09-01,insurance,HealthGuard Comprehensive Health Policy
+u_301,TX1028,Canva Pro,499,₹,2026-06-20,productivity,Canva Pro Creative Monthly
+u_301,TX1029,Canva Pro,499,₹,2026-07-20,productivity,Canva Pro Creative Monthly
+u_301,TX1030,Canva Pro,499,₹,2026-08-20,productivity,Canva Pro Creative Monthly
+u_301,TX1031,Canva Pro,599,₹,2026-09-20,productivity,Canva Pro Creative Monthly (Price Increased)
+u_301,TX1032,Headspace,0,₹,2026-08-05,mental_health,Headspace 30-Day Free Trial
+u_301,TX1033,Headspace,599,₹,2026-09-05,mental_health,Headspace Meditation Monthly Paid
+u_301,TX1034,YouTube Premium,129,₹,2026-07-01,video_streaming,YouTube Premium Bundle (Includes YouTube Music)
+u_301,TX1035,YouTube Premium,129,₹,2026-08-01,video_streaming,YouTube Premium Bundle (Includes YouTube Music)
+u_301,TX1036,YouTube Premium,129,₹,2026-09-01,video_streaming,YouTube Premium Bundle (Includes YouTube Music)
+u_301,TX1037,Spotify,119,₹,2026-07-15,music_streaming,Spotify Individual Plan
+u_301,TX1038,Spotify,119,₹,2026-08-15,music_streaming,Spotify Individual Plan
+u_301,TX1039,Spotify,119,₹,2026-09-15,music_streaming,Spotify Individual Plan
+u_301,TX1040,GitHub Copilot,800,₹,2026-07-22,developer_tools,GitHub Copilot Individual
+u_301,TX1041,GitHub Copilot,800,₹,2026-08-22,developer_tools,GitHub Copilot Individual
+u_301,TX1042,GitHub Copilot,800,₹,2026-09-22,developer_tools,GitHub Copilot Individual
+u_301,TX1043,HDFC Home Loan,18500,₹,2026-07-05,loan_payment,Monthly EMI Loan Repayment
+u_301,TX1044,HDFC Home Loan,18500,₹,2026-08-05,loan_payment,Monthly EMI Loan Repayment
+u_301,TX1045,HDFC Home Loan,18500,₹,2026-09-05,loan_payment,Monthly EMI Loan Repayment

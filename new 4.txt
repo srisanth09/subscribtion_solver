@@ -1,0 +1,1223 @@
+Absolutely. This problem statement is very suitable for an agentic-AI hackathon project because it isn't just “detect subscriptions”; the interesting part is that the AI must detect → reason → check guardrails → take action → escalate when uncertain.
+
+The uploaded problem statement calls it “Subscription & Recurring-Spend Guardian Agent” and defines the objective as scanning transaction/email history, identifying recurring subscriptions and waste, and acting autonomously within user-defined limits.
+
+1. What are we actually building?
+
+Think of your project as:
+
+An AI financial assistant that finds subscriptions you're wasting money on and, when it's safe, takes action to stop the recurring expense.
+
+For example:
+
+User has these transactions
+Service	Monthly	Last used
+Netflix	₹649	3 days ago
+Spotify	₹119	5 days ago
+Gym	₹1,500	90 days ago
+Canva	₹499	120 days ago
+Disney+	₹299	80 days ago
+
+The agent shouldn't simply say:
+
+“Cancel everything unused.”
+
+Instead, it reasons.
+
+Gym
+
+₹1,500/month
+unused for 90 days
+not protected
+below user's ₹2,000 autonomous-action limit
+high waste score
+→ Auto-cancel
+
+Netflix
+
+actively used
+→ Keep
+
+Disney+
+
+unused
+but perhaps overlaps with another streaming service
+→ Recommend cancellation / ask user
+
+Insurance
+
+₹2,500/month
+unused doesn't make sense as a cancellation criterion
+protected category
+→ Never automatically cancel
+
+That's the core intelligence of your project.
+
+2. The complete architecture
+
+I would build it like this:
+
+                  ┌─────────────────────┐
+                  │       USER          │
+                  │ "Clean my expenses" │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                ┌─────────────────────────┐
+                │     AI ORCHESTRATOR     │
+                │      / Agent Brain      │
+                └────────────┬────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            ▼                ▼                ▼
+     ┌─────────────┐  ┌──────────────┐  ┌─────────────┐
+     │ Transactions│  │    Emails    │  │ User Rules  │
+     │    Parser   │  │    Parser    │  │ Guardrails  │
+     └──────┬──────┘  └──────┬───────┘  └──────┬──────┘
+            │                │                  │
+            └────────────────┼──────────────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │ Subscription        │
+                  │ Detection Engine    │
+                  └──────────┬──────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │ Usage & Waste       │
+                  │ Analysis            │
+                  └──────────┬──────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │ Duplicate / Bundle  │
+                  │ Detection           │
+                  └──────────┬──────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │ Decision Engine     │
+                  │                     │
+                  │ Waste Score         │
+                  │ Confidence Score    │
+                  │ Guardrail Check     │
+                  └──────────┬──────────┘
+                             ▼
+              ┌──────────────┼──────────────┐
+              │              │              │
+              ▼              ▼              ▼
+          AUTO-CANCEL     DOWNGRADE       ESCALATE
+              │              │              │
+              └──────────────┼──────────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │ Action / Simulation │
+                  │ + Audit Log         │
+                  └──────────┬──────────┘
+                             ▼
+                  ┌─────────────────────┐
+                  │ Savings Dashboard   │
+                  └─────────────────────┘
+
+The problem statement itself divides the required functionality into Detect, Decide and Act, which maps almost perfectly onto this architecture.
+
+3. Module 1 — Transaction ingestion
+
+First, your system needs financial data.
+
+For a hackathon, do NOT try to connect to real bank accounts initially.
+
+Use a simulated dataset.
+
+For example:
+
+{
+  "transaction_id": "TX101",
+  "merchant": "Netflix",
+  "amount": 649,
+  "date": "2026-09-01",
+  "category": "streaming"
+}
+
+You can create:
+
+transactions.csv
+
+with:
+
+user_id
+merchant
+amount
+date
+category
+description
+
+Generate 6–12 months of transactions.
+
+This allows your AI to discover patterns.
+
+4. Module 2 — Email analysis
+
+This is an important part because the problem specifically says the agent should scan transaction and email history.
+
+Create simulated emails such as:
+
+Subject:
+Your StreamFlix subscription has renewed
+
+Body:
+Your monthly subscription of ₹649 has been renewed.
+Next billing date: October 1.
+
+Another:
+
+Subject:
+Important: Your subscription price is changing
+
+Your monthly plan will increase from ₹499 to ₹599
+starting October 15.
+
+Your email agent extracts:
+
+{
+    "merchant": "StreamFlix",
+    "event": "price_change",
+    "old_price": 499,
+    "new_price": 599,
+    "effective_date": "2026-10-15"
+}
+
+This helps you demonstrate price-hike detection.
+
+The problem explicitly requires detecting price hikes against the last billed amount.
+
+5. Module 3 — Detect recurring subscriptions
+
+This is your first major algorithm.
+
+Suppose transaction history is:
+
+Netflix
+₹649
+01 Jan
+
+Netflix
+₹649
+01 Feb
+
+Netflix
+₹649
+01 Mar
+
+Netflix
+₹649
+01 Apr
+
+Your system recognizes:
+
+Merchant = Netflix
+Frequency = Monthly
+Amount = ₹649
+Algorithm
+
+Group transactions by merchant.
+
+Then calculate:
+
+difference between transaction dates
+
+Example:
+
+Jan 1 → Feb 1 = 31 days
+Feb 1 → Mar 1 = 28 days
+Mar 1 → Apr 1 = 31 days
+
+Average ≈ 30 days.
+
+Therefore:
+
+Recurring subscription = TRUE
+Cadence = MONTHLY
+
+You can support:
+
+Weekly
+Monthly
+Quarterly
+Yearly
+6. Free-trial detection
+
+This is another required feature.
+
+Suppose email:
+
+"Your 30-day free trial starts today."
+
+Then transaction:
+
+30 days later
+Netflix
+₹649
+
+Your system identifies:
+
+FREE TRIAL
+      ↓
+Trial expires
+      ↓
+₹649 charge
+      ↓
+FREE-TRIAL → PAID CONVERSION
+
+This is valuable because the problem explicitly lists free-trial-to-paid conversions.
+
+7. Price-hike detection
+
+Suppose:
+
+June → ₹499
+July → ₹499
+August → ₹499
+September → ₹599
+
+Your algorithm calculates:
+
+old amount = ₹499
+new amount = ₹599
+
+increase = ₹100
+
+percentage increase =
+100 / 499 × 100
+≈ 20%
+
+Dashboard:
+
+⚠ PRICE INCREASE
+
+Canva
+₹499 → ₹599
++20%
+
+Action:
+Review subscription
+8. Duplicate / overlapping subscription detection
+
+This is one of the coolest features for your presentation.
+
+Suppose:
+
+Spotify       ₹119
+Apple Music   ₹99
+YouTube Music ₹129
+
+All belong to:
+
+music_streaming
+
+Your AI detects:
+
+3 subscriptions
+       ↓
+Same category
+       ↓
+Potential overlap
+
+But don't automatically cancel two of them.
+
+Why?
+
+Because the user may intentionally have multiple services.
+
+Instead:
+
+You use:
+
+Spotify
+Last used: 4 days ago
+
+MusicBox
+Last used: 40 days ago
+
+Both are music services.
+
+Recommendation:
+Keep Spotify and review MusicBox.
+
+[Cancel MusicBox]
+[Keep Both]
+
+This exactly follows the problem's ambiguous example: the agent should recognize the duplicate category but ask the user rather than assuming their preference.
+
+9. The Waste Score
+
+This is where your ML/AI reasoning comes in.
+
+Create a Waste Score from 0–100.
+
+For example:
+
+Waste Score =
+Usage factor
++ Cost factor
++ Recurrence factor
++ Overlap factor
++ Price increase factor
+
+You don't necessarily need a trained ML model.
+
+For a hackathon, a transparent scoring algorithm is actually easier to explain.
+
+Example:
+
+Unused > 90 days      +40
+Unused > 60 days      +30
+Unused > 30 days      +20
+
+Monthly cost > ₹1000  +20
+
+Duplicate category    +20
+
+Price increased       +10
+
+Then normalize to 100.
+
+Example:
+
+Gym
+
+Unused 90 days       +40
+Cost ₹1500           +20
+No overlap            +0
+Price unchanged       +0
+
+Waste Score = 60/100
+10. Confidence Score
+
+This is different from Waste Score.
+
+Waste Score
+
+“How wasteful does this subscription appear?”
+
+Confidence Score
+
+“How confident is the AI that its decision is correct?”
+
+Example:
+
+Gym
+Unused 187 days
+Recurring monthly charge
+₹14.99
+Clear transaction history
+
+Waste Score: 92
+Confidence: 98%
+
+But:
+
+MusicBox
+Unused 40 days
+Another music service actively used
+Possible duplicate
+
+Waste Score: 75
+Confidence: 65%
+
+Therefore:
+
+Don't auto-cancel.
+Ask user.
+11. Guardrails — THE MOST IMPORTANT PART
+
+This is what makes the project agentic rather than simply an AI recommendation system.
+
+The user defines rules.
+
+For example:
+
+Auto-action limit: ₹20
+
+Protected categories:
+- Insurance
+- Loan payments
+
+Then every decision goes through:
+
+                  Decision
+                     │
+                     ▼
+              ┌──────────────┐
+              │ Guardrail    │
+              │ Engine       │
+              └──────┬───────┘
+                     │
+          ┌──────────┴──────────┐
+          ▼                     ▼
+       Allowed                Blocked
+          │                     │
+          ▼                     ▼
+    Agent can act          Ask user
+12. Example — Safe automatic cancellation
+
+Problem statement example:
+
+StreamFlix
+$14.99/month
+Last used: 187 days ago
+
+Auto-action limit: $20
+
+Therefore:
+
+$14.99 < $20
+
+And:
+
+Unused for 187 days
+
+Decision:
+
+AUTO-CANCEL
+
+The expected behavior in the problem statement is precisely to auto-cancel and log the reason.
+
+13. Example — Ambiguous decision
+TuneWave
+$9.99
+Used 4 days ago
+
+MusicBox
+$11.99
+Used 40 days ago
+
+AI:
+
+Both = music streaming
+
+TuneWave:
+usage = high
+
+MusicBox:
+usage = low
+
+It may conclude:
+
+MusicBox appears more wasteful.
+
+But:
+
+confidence < threshold
+
+Therefore:
+
+ESCALATE
+
+User sees:
+
+“You currently pay for two music streaming services. TuneWave was used 4 days ago, while MusicBox was last used 40 days ago. I recommend reviewing MusicBox, but I won't cancel it without your approval.”
+
+That's exactly the intended behavior.
+
+14. Protected category
+
+Suppose:
+
+HealthGuard Insurance
+₹89/month
+Category = insurance
+
+Even if:
+
+Unused = 300 days
+
+The agent must not cancel it.
+
+Because:
+
+insurance ∈ protected_categories
+
+Decision:
+
+BLOCK AUTO ACTION
+       ↓
+ESCALATE TO USER
+
+The provided example explicitly says insurance and loan payments should never be automatically cancelled.
+
+15. Your Agent Brain
+
+This is the heart of the project.
+
+I would implement the agent as several specialized components rather than one giant LLM prompt.
+
+                  USER REQUEST
+                       │
+                       ▼
+                ┌─────────────┐
+                │ Orchestrator│
+                └──────┬──────┘
+                       │
+       ┌───────────────┼────────────────┐
+       ▼               ▼                ▼
+ Transaction       Email Agent      Guardrail Agent
+    Agent
+       │               │                │
+       └───────────────┼────────────────┘
+                       ▼
+                Decision Agent
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+       Cancel       Downgrade    Escalate
+16. What does the LLM actually do?
+
+Don't make the LLM responsible for everything.
+
+Use traditional code for deterministic tasks.
+
+Code handles
+Date calculations
+Transaction grouping
+Amount calculations
+Waste score
+Guardrails
+Protected categories
+Confidence thresholds
+Database operations
+LLM handles
+Understanding emails
+Merchant/category interpretation
+Explaining decisions
+Generating cancellation messages
+Understanding natural-language user requests
+Negotiation emails
+
+This architecture is much easier to defend during judging.
+
+17. Example agent workflow
+
+User says:
+
+“Go through my subscriptions and clean up anything I'm not using.”
+
+Step 1
+
+LLM interprets:
+
+intent = subscription_audit
+Step 2
+
+Transaction agent retrieves:
+
+all recurring transactions
+Step 3
+
+Email agent retrieves:
+
+subscription emails
+trial emails
+price-change emails
+Step 4
+
+Detection engine produces:
+
+[
+  {
+    "merchant": "StreamFlix",
+    "amount": 14.99,
+    "cadence": "monthly",
+    "last_used_days": 187
+  }
+]
+Step 5
+
+Waste engine:
+
+waste_score = 92
+Step 6
+
+Guardrail:
+
+14.99 < 20
+protected = false
+Step 7
+
+Confidence:
+
+98%
+Step 8
+
+Action engine:
+
+AUTO_CANCEL
+Step 9
+
+Audit log:
+
+09:00
+StreamFlix
+
+Action:
+Cancelled
+
+Reason:
+Unused for 187 days
+Cost below auto-action limit
+High confidence
+
+Estimated monthly savings:
+$14.99
+18. Action execution
+
+For the hackathon, I'd simulate the actual cancellation unless the organizers provide safe APIs.
+
+Create an Action Service:
+
+POST /subscriptions/{id}/cancel
+POST /subscriptions/{id}/downgrade
+POST /subscriptions/{id}/pause
+
+Your backend can change:
+
+status = "cancelled"
+
+Then show:
+
+✓ Subscription cancelled successfully
+
+This lets you demonstrate autonomous action without risking real financial accounts.
+
+19. Dashboard
+
+Your frontend should look like a financial control center.
+
+Main dashboard:
+
+────────────────────────────────────────────
+
+       SUBSCRIPTION GUARDIAN
+
+Potential Monthly Savings
+        ₹2,418
+
+Potential Annual Savings
+        ₹29,016
+
+────────────────────────────────────────────
+
+Subscriptions      12
+
+Wasteful            4
+
+Price Changes       2
+
+Duplicates          2
+
+Needs Approval      3
+
+────────────────────────────────────────────
+
+Then subscription cards:
+
+┌───────────────────────────────────────┐
+│ 🎬 StreamFlix                         │
+│ ₹649 / month                          │
+│                                       │
+│ Last used: 187 days ago               │
+│ Waste Score: 92                       │
+│ Confidence: 98%                       │
+│                                       │
+│ 🔴 HIGH WASTE                         │
+│                                       │
+│ [AUTO CANCELLED]                      │
+└───────────────────────────────────────┘
+20. Approval screen
+
+For ambiguous decisions:
+
+┌────────────────────────────────────────┐
+│ ⚠ YOUR APPROVAL NEEDED                 │
+│                                        │
+│ MusicBox Premium                       │
+│ ₹999 / month                           │
+│                                        │
+│ You also have TuneWave                 │
+│ ₹799 / month                           │
+│                                        │
+│ TuneWave was used 4 days ago.          │
+│ MusicBox was used 40 days ago.         │
+│                                        │
+│ Potential saving: ₹999/month           │
+│                                        │
+│ [Cancel MusicBox] [Keep Both]          │
+└────────────────────────────────────────┘
+
+This demonstrates human-in-the-loop AI.
+
+21. Tech stack I'd use
+
+Since your team already works with React/Node and Python/ML, I'd keep it simple.
+
+Frontend
+React
+Vite
+Tailwind CSS
+Lucide React
+Framer Motion
+Backend
+Python
+FastAPI
+AI
+LLM API
+Data processing
+Pandas
+Python
+Database
+
+For hackathon:
+
+MongoDB
+
+or:
+
+PostgreSQL
+
+I'd use PostgreSQL if you want a clean relational model.
+
+Optional
+LangGraph
+
+for explicit agent workflow/state management.
+
+22. Database design
+
+You could have:
+
+Users
+users
+-----
+id
+name
+auto_action_limit
+Transactions
+transactions
+------------
+id
+user_id
+merchant
+amount
+date
+category
+Subscriptions
+subscriptions
+-------------
+id
+user_id
+merchant
+amount
+cadence
+category
+last_used
+waste_score
+confidence_score
+status
+Guardrails
+guardrails
+----------
+user_id
+auto_action_limit
+protected_categories
+Actions
+actions
+-------
+id
+subscription_id
+action_type
+reason
+confidence
+timestamp
+23. API structure
+
+Your FastAPI backend could expose:
+
+POST /audit
+
+GET /subscriptions
+
+GET /subscriptions/{id}
+
+POST /subscriptions/{id}/cancel
+
+POST /subscriptions/{id}/downgrade
+
+POST /subscriptions/{id}/pause
+
+POST /subscriptions/{id}/approve
+
+GET /savings
+
+GET /audit-log
+
+The most important endpoint:
+
+POST /audit
+
+User clicks:
+
+“Scan my subscriptions”
+
+Then the entire agent workflow executes.
+
+24. Agent state
+
+This is another thing you can mention to judges.
+
+The agent maintains state:
+
+{
+  "subscription": "StreamFlix",
+  "waste_score": 92,
+  "confidence": 0.98,
+  "guardrail_passed": true,
+  "decision": "cancel",
+  "action_status": "completed"
+}
+
+For MusicBox:
+
+{
+  "subscription": "MusicBox",
+  "waste_score": 75,
+  "confidence": 0.65,
+  "guardrail_passed": true,
+  "decision": "ask_user",
+  "action_status": "pending"
+}
+25. Why this is Agentic AI
+
+This is something judges may ask:
+
+“Why isn't this just an ML classifier?”
+
+Answer:
+
+Because the system doesn't merely predict whether a subscription is wasteful.
+
+It:
+
+Perceives
+   ↓
+Reasons
+   ↓
+Checks constraints
+   ↓
+Chooses an action
+   ↓
+Executes the action
+   ↓
+Observes the result
+   ↓
+Logs the outcome
+   ↓
+Escalates when uncertain
+
+That's an agentic workflow.
+
+26. Stretch feature — Negotiation Mode
+
+The problem statement specifically proposes a negotiation mode.
+
+Instead of:
+
+CANCEL
+
+the agent can try:
+
+NEGOTIATE
+
+Example:
+
+“We've noticed your subscription has increased from ₹499 to ₹699. Would you be able to offer a discounted annual plan?”
+
+Merchant response:
+
+10% discount offered
+
+Agent:
+
+Accept discount
+
+If merchant says:
+
+No discount available
+
+Then:
+
+Proceed to cancellation
+
+For the hackathon, simulate the merchant API/email response.
+
+27. Stretch feature — Bundle detection
+
+Suppose:
+
+Spotify = ₹119
+YouTube Premium = ₹129
+
+But YouTube Premium already includes:
+
+YouTube Music
+
+Agent detects:
+
+Existing bundle
+       ↓
+Separate Spotify subscription
+       ↓
+Potential redundant expense
+
+Then:
+
+Potential saving = ₹119/month
+
+The problem statement explicitly lists recognizing cheaper family, bundle, or employer-provided coverage as a stretch capability.
+
+28. Savings report
+
+At the end:
+
+        MONTHLY SAVINGS REPORT
+
+Subscriptions reviewed       14
+
+Automatically cancelled        3
+Downgraded                      1
+User approvals pending         2
+
+Monthly savings             ₹2,418
+
+Projected annual savings   ₹29,016
+
+This directly maps to the optional savings-report capability in the problem statement.
+
+29. The complete demo you should present
+
+For the hackathon, don't try to demonstrate 50 features.
+
+Prepare one excellent 3–5 minute story.
+
+Scene 1 — Dashboard
+
+Show:
+
+12 subscriptions
+₹3,800 potential monthly waste
+
+Click:
+
+“Run Guardian Audit”
+
+Scene 2 — Agent starts
+
+Show an agent activity panel:
+
+✓ Reading transaction history
+
+✓ Analyzing subscription patterns
+
+✓ Reading billing emails
+
+✓ Detecting price changes
+
+✓ Checking duplicate services
+
+✓ Calculating waste scores
+
+✓ Checking user guardrails
+
+This makes the agent visible.
+
+Scene 3 — Safe action
+
+Show:
+
+StreamFlix
+
+Unused: 187 days
+Cost: ₹649/month
+Waste score: 94
+Confidence: 98%
+
+Guardrail:
+✓ Under auto-action limit
+
+Decision:
+AUTO-CANCEL
+
+Click.
+
+✓ Cancelled
+Scene 4 — Ambiguous case
+
+Show:
+
+TuneWave
+MusicBox
+
+Both music services.
+
+TuneWave:
+Used 4 days ago
+
+MusicBox:
+Used 40 days ago
+
+Agent says:
+
+“Potential overlap detected, but I can't determine which service you prefer.”
+
+Then:
+
+USER APPROVAL REQUIRED
+
+This demonstrates that your agent doesn't blindly act.
+
+Scene 5 — Protected subscription
+
+Show:
+
+HealthGuard Insurance
+
+₹89/month
+Unused: 200 days
+
+Protected category:
+INSURANCE
+
+AUTO ACTION:
+BLOCKED
+
+This is an excellent safety demonstration.
+
+30. Your project flow in one diagram
+
+Put this in your PPT:
+
+                 USER
+                  │
+                  ▼
+        ┌───────────────────┐
+        │ Natural Language  │
+        │ Request           │
+        └─────────┬─────────┘
+                  ▼
+        ┌───────────────────┐
+        │ AI ORCHESTRATOR   │
+        └─────────┬─────────┘
+                  ▼
+       ┌─────────────────────┐
+       │ Data Collection      │
+       │ Transactions + Email │
+       └──────────┬──────────┘
+                  ▼
+       ┌─────────────────────┐
+       │ Subscription         │
+       │ Detection            │
+       └──────────┬──────────┘
+                  ▼
+       ┌─────────────────────┐
+       │ Intelligence Layer   │
+       │                      │
+       │ • Usage Analysis     │
+       │ • Waste Score        │
+       │ • Duplicate Detect   │
+       │ • Price Hike         │
+       │ • Confidence         │
+       └──────────┬──────────┘
+                  ▼
+       ┌─────────────────────┐
+       │ Guardrail Engine     │
+       └──────────┬──────────┘
+                  │
+          ┌───────┼────────┐
+          ▼       ▼        ▼
+       CANCEL  DOWNGRADE  ESCALATE
+          │       │        │
+          └───────┼────────┘
+                  ▼
+       ┌─────────────────────┐
+       │ Action Executor      │
+       │ + Audit Log          │
+       └──────────┬──────────┘
+                  ▼
+       ┌─────────────────────┐
+       │ Savings Dashboard    │
+       └─────────────────────┘
+31. What each teammate can build
+
+If you have 4 members, divide it like this:
+
+Member 1 — Backend/Data
+FastAPI
+Database
+Transaction APIs
+Subscription detection
+Member 2 — AI/Agent
+LLM integration
+Email extraction
+Waste scoring
+Confidence
+Agent orchestration
+Member 3 — Frontend
+React dashboard
+Subscription cards
+Agent activity
+Approval UI
+Savings dashboard
+Member 4 — Action/Safety + Integration
+Guardrail engine
+Cancel/downgrade simulation
+Audit logs
+Negotiation mode
+Demo dataset
+
+And everyone should understand the full flow, because judges can ask anyone anything.
+
+32. What you should NOT overbuild
+
+Avoid spending hackathon time on:
+
+❌ Real bank integration
+❌ Real credit-card access
+❌ Complex deep-learning model
+❌ Training an ML model from scratch
+❌ Actual merchant cancellation APIs
+❌ 20 different agents
+❌ Blockchain
+❌ Kubernetes
+
+The intelligence is primarily in the decision workflow.
+
+33. Minimum viable product
+
+If time becomes short, build only these:
+
+MUST HAVE
+✓ Transaction dataset
+✓ Recurring subscription detection
+✓ Usage/waste score
+✓ Duplicate detection
+✓ Price hike detection
+✓ Guardrails
+✓ Confidence score
+✓ Auto-cancel simulation
+✓ Human approval
+✓ Dashboard
+✓ Audit log
+NICE TO HAVE
+→ Email analysis
+→ Negotiation
+→ Bundle detection
+→ Price prediction
+→ Savings report
+
+The required problem statement already gives you the core three-stage model—Detect, Decide, Act—so make those three stages extremely polished rather than spreading yourselves thin.
